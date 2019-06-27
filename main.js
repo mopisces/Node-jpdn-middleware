@@ -8,10 +8,6 @@ var app = new Koa();
 
 var proxy = httpProxy.createProxyServer({});
 proxy.on('proxyReq',function(proxyReq,req,res,options){
-	if(req.method == 'OPTIONS'){
-		console.dir('OPTIONS');
-	}
-	console.dir('get');
 	proxyReq.setHeader('referer','http://127.0.0.1:3000');
 })
 
@@ -43,7 +39,7 @@ var server = http.createServer(function(req,res){
 server.listen(3000);
 
 proxy.on('proxyRes', function (proxyRes, req, res) {
-  console.log('RAW Response from the target', JSON.stringify(proxyRes.headers, true, 2));
+	console.log('RAW Response from the target', JSON.stringify(proxyRes.headers, true, 2));
 });
 
 //app.listen(3000);

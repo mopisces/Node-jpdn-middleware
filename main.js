@@ -11,8 +11,9 @@ proxy.on('proxyReq',function(proxyReq,req,res,options){
 	proxyReq.setHeader('referer','http://127.0.0.1:3000');
 })
 
+
 var server = http.createServer(function(req,res){
-	proxy.web(req,res,{target:'http://127.0.0.1:3030'});
+	proxy.web(req,res,{target:'http://127.0.0.1:3030',selfHandleResponse : true});
 })
 /*http.createServer(function(req,res){
 	res.writeHead(200,{'Content-Type':'text/plain'});
@@ -36,12 +37,20 @@ var server = http.createServer(function(req,res){
 	proxy.web(req,res,options);
 	//proxy.web(req, res, { target: 'http://127.0.0.1:3030' });
 });*/
+
 server.listen(3000);
 
 proxy.on('proxyRes', function (proxyRes, req, res) {
-	console.log('RAW Response from the target', JSON.stringify(proxyRes.headers, true, 2));
+	var body = new Buffer('');
+	proxyRes.on('data', function (data) {
+		body = Buffer.concat([body, data]);
+	});
+	proxyRes.on('end', function () {
+		body = body.toString();
+		console.log("res from proxied server:", body);
+		res.end(body);
+	})
 });
-
 //app.listen(3000);
 //
 //{"accept-language":"zh-CN,zh;q=0.9",
